@@ -14,26 +14,36 @@ thread_test_03:
 Test AccelStepper:
 
 ```c++
-#include <AccelStepper.h>
+const int DIR = 12;
+const int STEP = 14;
 
-#define motorStep 14
-#define motorDir 12
-#define motorEnable 4
-AccelStepper stepper(1, motorStep, motorDir);
+const int speed = 500; // MAX_SPEED = 250  MIN_SPEED = 1000
 
-
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  stepper.setMaxSpeed(1000.0);
-  stepper.setAcceleration(2000.0);
-  //stepper.setSpeed(150);  
+  pinMode(STEP, OUTPUT);
+  pinMode(DIR, OUTPUT);
 }
 
-void loop() {
-  stepper.setSpeed(350); 
-  delay(2000);
-  stepper.setSpeed(-350); 
-  delay(2000);
-  stepper.stop();
+void moveF() {
+  digitalWrite(DIR, HIGH);
+  digitalWrite(STEP, HIGH);
+  delayMicroseconds(speed);
+  digitalWrite(STEP, LOW);
+  delayMicroseconds(speed);
+}
+
+void moveB() {
+  digitalWrite(DIR, LOW);
+  digitalWrite(STEP, HIGH);
+  delayMicroseconds(speed);
+  digitalWrite(STEP, LOW);
+  delayMicroseconds(speed);
+}
+
+void loop()
+{
+  moveF();
 }
 ```
