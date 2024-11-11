@@ -68,8 +68,9 @@ const int DIR = 12;
 const int STEP = 14;
 
 int speed = 500; // MAX_SPEED = 250  MIN_SPEED = 1000
-int direction = 0;
+int direction = 0; // 0 - idle; 3 - cw; 4 - acw;
 int slider = 0;
+
 
 const char index_html[] PROGMEM = R"rawliteral(
   <!DOCTYPE HTML><html>
@@ -132,7 +133,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <div class="div1">
         <div class="parent-j">
             <button class="div-l" id="btn-lt">CW</button>
-            <button class="div-r" id="btn-rt">AC</button>
+            <button class="div-r" id="btn-rt">ACW</button>
             <button class="div-s" id="btn-sp">STOP</button>
         </div>
     </div>
@@ -252,11 +253,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     JSONVar myObject = JSON.parse((const char*)data);
     if (myObject.hasOwnProperty("slider")) {
       slider = (int)myObject["slider"];
+      
       speed = map(slider, 0, 255, 1000, 250);
+      Serial.println(speed);
     }
     else if (myObject.hasOwnProperty("dir")) {
       direction = (int)myObject["dir"];
-      move(direction, speed);      
     }
 
     String sensorReadings = getSensorReadings();
@@ -306,12 +308,14 @@ void move(int direction, int speed) {
   }
   else if (direction == 3){
     digitalWrite(DIR, HIGH);
+    digitalWrite(STEP, HIGH);
     delayMicroseconds(speed);
-    digitalWrite(STEP, LOW); // ?
+    digitalWrite(STEP, LOW);
     delayMicroseconds(speed);
   }
   else if (direction == 4){
     digitalWrite(DIR, LOW);
+    digitalWrite(STEP, HIGH);
     delayMicroseconds(speed);
     digitalWrite(STEP, LOW);
     delayMicroseconds(speed);
@@ -320,5 +324,7 @@ void move(int direction, int speed) {
 
 void loop()
 {
+  move(direction, speed); 
+  //Serial.println(direction);
 }
 ```
